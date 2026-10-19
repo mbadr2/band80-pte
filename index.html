@@ -1,0 +1,383 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#080D17"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Band 80"></head><body><title>Band 80 PTE Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: exam-console. Sticky top bar with tabs, single 1080px column, runner styled like the test screen (grey header bar, white work area, timer box). */
+:root{
+  --paper:#EEF1F5; --surface:#FFFFFF; --sunk:#E3E8EF; --ink:#16233B; --muted:#5A6579; --line:#D3DAE4;
+  --accent:#1D5BD6; --accent-ink:#FFFFFF; --rec:#E4572E; --ok:#14866D; --okbg:#DDF3EC; --mid:#B7791F; --midbg:#FBEFD9; --bad:#C23B3B; --badbg:#F8E0E0;
+  --c0:#1D5BD6; --c1:#14866D; --c2:#E4572E; --c3:#B7791F; --c4:#7A4FD1; --c5:#5A6579;
+  --display:"Archivo",system-ui,sans-serif; --body:"Archivo",system-ui,sans-serif; --read:"Source Serif 4",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace; --ar:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --r:10px; --bar:#16233B; --bar-ink:#EEF1F5;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1420; --surface:#162033; --sunk:#1C2840; --ink:#E6ECF6; --muted:#9BA8BE; --line:#2B3854;
+  --accent:#6E9BFF; --accent-ink:#0E1420; --rec:#FF7A52; --ok:#3CCB9F; --okbg:#143A33; --mid:#E8B04F; --midbg:#3A2E16; --bad:#FF7272; --badbg:#3E1D22;
+  --c0:#6E9BFF; --c1:#3CCB9F; --c2:#FF7A52; --c3:#E8B04F; --c4:#B394FF; --c5:#9BA8BE; --bar:#080D17; --bar-ink:#E6ECF6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1420; --surface:#162033; --sunk:#1C2840; --ink:#E6ECF6; --muted:#9BA8BE; --line:#2B3854;
+  --accent:#6E9BFF; --accent-ink:#0E1420; --rec:#FF7A52; --ok:#3CCB9F; --okbg:#143A33; --mid:#E8B04F; --midbg:#3A2E16; --bad:#FF7272; --badbg:#3E1D22;
+  --c0:#6E9BFF; --c1:#3CCB9F; --c2:#FF7A52; --c3:#E8B04F; --c4:#B394FF; --c5:#9BA8BE; --bar:#080D17; --bar-ink:#E6ECF6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0 0 .4em;line-height:1.2}
+h2{font-size:1.55rem;font-variation-settings:"wdth" 88;font-weight:750}
+h3{font-size:1.1rem;font-weight:700}
+h4{font-size:.92rem;font-weight:700;margin-top:1em}
+p{margin:.3em 0 .7em}
+.muted{color:var(--muted)} .sm{font-size:.82rem} .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.ar{font-family:var(--ar);direction:rtl;text-align:right;line-height:1.8}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary,.ghost{border-radius:8px;padding:.6em 1.1em;font-weight:650;border:1px solid transparent}
+.primary{background:var(--accent);color:var(--accent-ink)}
+.primary:disabled{opacity:.5;cursor:default}
+.ghost{background:var(--surface);border-color:var(--line)}
+.ghost:hover{border-color:var(--accent)}
+.sm.ghost,.ghost.sm{padding:.3em .7em;font-size:.82rem}
+.link{background:none;border:0;padding:0;text-align:left;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bar);color:var(--bar-ink)}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;padding-block:10px}
+.brand{display:flex;align-items:baseline;gap:8px;font-family:var(--display);font-weight:800;font-size:1.15rem;font-variation-settings:"wdth" 80;letter-spacing:.01em}
+.brand span{font-family:var(--mono);font-size:.72rem;font-weight:400;opacity:.7}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{background:transparent;border:0;color:inherit;opacity:.72;padding:.45em .8em;border-radius:6px;font-weight:600}
+.tabs button[aria-current="page"]{opacity:1;background:rgba(255,255,255,.14)}
+.envbar{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.env{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;padding:.2em .6em;border-radius:99px;background:rgba(255,255,255,.1)}
+.env::before{content:"";width:7px;height:7px;border-radius:50%;background:#9AA5B8}
+.env[data-state="on"]::before{background:#3CCB9F}.env[data-state="off"]::before{background:#FF9C6E}
+.env b{font-weight:500}
+main,#plan{padding-block:22px 60px}
+
+/* cards & hero */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px}
+.grid2 .card{margin:0}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;margin-bottom:16px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:650}
+.overall{font-size:4.6rem;line-height:1;font-weight:600;letter-spacing:-.03em;margin:.1em 0 .15em}
+.overall span{font-size:1.2rem;color:var(--muted);margin-left:4px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.skills{display:grid;gap:14px}
+.sk-top{display:flex;justify-content:space-between;font-weight:650}
+.sk-top b{font-size:1.15rem}
+.scale{position:relative;height:12px;background:var(--sunk);border-radius:99px;margin:5px 0 3px;overflow:visible}
+.scale i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:99px}
+.scale .target{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--rec)}
+.legend{margin-top:12px}.legend .tgt{display:inline-block;width:2px;height:11px;background:var(--rec);vertical-align:-1px}
+.next,.recent{list-style:none;margin:0;padding:0}
+.next li,.recent li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.next li:first-child,.recent li:first-child{border-top:0}
+.nx-name{flex:1;min-width:0;display:flex;flex-direction:column}
+.recent li span:nth-child(2){flex:1;min-width:0}
+.code{display:inline-block;font-size:.72rem;font-weight:600;padding:.12em .45em;border-radius:5px;background:var(--sunk);color:var(--ink);min-width:3.4em;text-align:center}
+.new{display:inline-block;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.12em .45em;border-radius:5px;background:var(--midbg);color:var(--mid)}
+.pill{display:inline-block;font-size:.72rem;font-weight:650;padding:.2em .6em;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--okbg);color:var(--ok)}.pill.mid{background:var(--midbg);color:var(--mid)}.pill.low{background:var(--badbg);color:var(--bad)}.pill.none{background:var(--sunk);color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;min-width:620px}
+.tbl th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:650;padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:8px;border-bottom:1px solid var(--line)}
+.tbl tr[data-task]{cursor:pointer}.tbl tr[data-task]:hover td{background:var(--sunk)}
+.num{text-align:right}
+
+/* practice */
+.head{margin-bottom:18px}
+.head.compact .tip{display:none}
+.part{margin-bottom:22px}
+.part h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tcard{display:flex;flex-direction:column;gap:5px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.tcard:hover{border-color:var(--accent)}
+.tcard.heavy{border-left:4px solid var(--accent)}
+.tc-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tc-top .pill{margin-left:auto}
+.tc-meta{color:var(--muted)}
+.tip{background:var(--sunk);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.95rem}
+.task-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.toggle{display:inline-flex;gap:6px;align-items:center;font-size:.85rem;color:var(--muted)}
+.items ul{list-style:none;padding:0;margin:10px 0 0}
+.items li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--line)}
+.items summary{cursor:pointer;font-weight:650}
+.back{margin-bottom:10px}
+
+/* runner: modelled on the test screen */
+.runner{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.rbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;background:var(--sunk);padding:10px 16px;border-bottom:1px solid var(--line)}
+.rhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.rclock{font-size:.85rem;padding:.25em .6em;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.rclock:empty{display:none}
+.instr{font-size:.9rem;font-style:italic;color:var(--muted);padding:14px 18px 0;margin:0}
+.rbody{padding:14px 18px;display:grid;gap:14px;min-width:0}
+.rfoot{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:var(--sunk)}
+.passage{font-family:var(--read);font-size:1.08rem;line-height:1.75;max-width:70ch;min-width:0}
+.passage.prompt{font-weight:600}
+.lecture{display:flex;flex-direction:column;border-left:3px solid var(--accent);padding-left:12px}
+.aud,.spk{border:1px solid var(--line);border-radius:8px;padding:10px 14px;max-width:520px;background:var(--surface)}
+.aud-row,.spk-row{display:flex;align-items:center;gap:10px;font-size:.88rem}
+.aud-ic{width:0;height:0;border-left:10px solid var(--accent);border-top:6px solid transparent;border-bottom:6px solid transparent}
+.aud .lbl,.spk-lbl{flex:1}
+.prog{height:6px;background:var(--sunk);border-radius:99px;margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s linear}
+.spk-dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.spk[data-state="rec"] .spk-dot{background:var(--rec);animation:pulse 1s infinite}
+.spk[data-state="rec"] .prog i{background:var(--rec)}
+.spk[data-state="self"] .spk-dot{background:var(--mid)}
+.spk[data-state="done"] .spk-dot{background:var(--ok)}
+.meter{height:4px;background:var(--sunk);border-radius:99px;margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--ok)}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.spk-dot{animation:none!important}.prog i{transition:none}}
+.notes summary{font-size:.82rem;color:var(--muted);cursor:pointer}
+.notes textarea{width:100%;margin-top:6px;font:14px/1.5 var(--mono);background:var(--sunk);color:var(--ink);border:1px dashed var(--line);border-radius:6px;padding:8px}
+.chart-wrap{max-width:640px;overflow-x:auto}
+.chart{width:100%;height:auto;max-width:100%;background:var(--surface)}
+.chart .ct{font:600 15px var(--body);fill:var(--ink)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .ax{font:12px var(--body);fill:var(--muted)}
+.chart .lg{font-size:14px;fill:var(--ink)}
+.chart .step{font:600 10px var(--mono);letter-spacing:.08em}
+.chart .val{font:600 12.5px var(--mono);fill:var(--ink)}
+.chart .bar{fill:var(--c0)}
+.chart .ln{fill:none;stroke:var(--c0);stroke-width:2.5}
+.chart .pt{fill:var(--surface);stroke:var(--c0);stroke-width:2}
+.chart .box{fill:var(--sunk);stroke:var(--line)}
+.chart .arr{stroke:var(--muted);stroke-width:1.6}
+.chart .ahd{fill:var(--muted)}
+.chart .s0{fill:var(--c0)}.chart .s1{fill:var(--c1)}.chart .s2{fill:var(--c2)}.chart .s3{fill:var(--c3)}.chart .s4{fill:var(--c4)}.chart .s5{fill:var(--c5)}
+.wbox textarea,.wbox input{width:100%;font:16px/1.6 var(--read);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.wbox textarea:focus,.wbox input:focus{border-color:var(--accent);outline:none}
+.wfoot{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-top:4px}
+.wc.warn{color:var(--bad)}
+select.blank{font:inherit;font-size:.95rem;padding:1px 4px;margin:0 2px;border:1px solid var(--accent);border-radius:4px;background:var(--surface);color:var(--ink);max-width:100%}
+.ok{border-color:var(--ok)!important;background:var(--okbg)!important}
+.bad{border-color:var(--bad)!important;background:var(--badbg)!important}
+.q{font-weight:650}
+.choices{border:0;padding:0;margin:0;display:grid;gap:6px}
+.choice{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.choice input{margin-top:4px}
+.ro{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.ro li{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:grab}
+.ro-tag{font-size:.75rem;background:var(--sunk);padding:.1em .45em;border-radius:4px}
+.ro-txt{flex:1;min-width:0;font-family:var(--read)}
+.ro-btns{display:flex;flex-direction:column;gap:4px}
+.ro.locked .ro-btns{display:none}
+.ro-key{font-family:var(--read);padding-left:1.2em}
+button.drop{display:inline-block;min-width:7.5em;min-height:1.6em;vertical-align:baseline;border:1px dashed var(--accent);border-radius:4px;background:var(--sunk);padding:0 .4em;margin:0 2px;font:inherit;font-size:.95rem}
+button.drop.active{border-style:solid;box-shadow:0 0 0 2px var(--accent)}
+.pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--sunk);border-radius:8px}
+.chip-w{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.3em .8em;font-family:var(--read)}
+.chip-w:hover{border-color:var(--accent)}
+input.gap{font:inherit;font-size:.95rem;width:8.5em;max-width:100%;border:0;border-bottom:2px solid var(--accent);background:var(--sunk);color:var(--ink);padding:0 4px;margin:0 2px}
+.hiw .hw{cursor:pointer;border-radius:3px;padding:0 1px}
+.hiw .hw:hover{background:var(--sunk)}
+.hiw .hw.sel{background:var(--midbg);color:var(--mid)}
+.hiw .hw.ok{background:var(--okbg);color:var(--ok)}
+.hiw .hw.missed{background:var(--midbg);color:var(--mid);text-decoration:underline}
+.hiw .hw.bad{background:var(--badbg);color:var(--bad)}
+.rate-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.rate{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font:600 1rem var(--mono)}
+.rate:hover{border-color:var(--accent);background:var(--sunk)}
+.thinking{color:var(--muted);font-style:italic}
+.thinking::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;animation:pulse 1s infinite}
+
+/* result */
+.result{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:12px}
+.res-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.res-big{font-size:2rem;font-weight:600}
+.traits{display:grid;gap:8px;margin:14px 0;max-width:560px}
+.trait{display:grid;grid-template-columns:minmax(0,11em) 1fr auto;gap:10px;align-items:center;font-size:.88rem;text-transform:capitalize}
+.tbar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--accent)}
+.res-body{min-width:0}
+.res-body audio{width:100%;max-width:420px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--muted);margin:8px 0}
+.heard,.diff,.kp{font-family:var(--read);line-height:1.8}
+.diff .hit,.kp .hit{color:var(--ok)}
+.diff .miss,.kp .miss{color:var(--bad);text-decoration:underline wavy;text-underline-offset:3px}
+.kp span{display:inline-block;padding:0 .4em;border-radius:4px;background:var(--sunk);margin:2px}
+.model{background:var(--sunk);border-radius:8px;padding:10px 14px;margin-top:10px;font-family:var(--read)}
+.model h4{font-family:var(--display);margin-top:0}
+.corr{padding-left:1.1em;font-family:var(--read)}
+.corr s{color:var(--bad)}
+.fb{background:var(--sunk);border-radius:8px;padding:10px 14px;margin:10px 0}
+.after{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-bottom:24px}
+details summary{cursor:pointer}
+.mockc{display:flex;flex-direction:column;gap:6px}
+.mockc .primary,.mockc .ghost{align-self:flex-start;margin-top:auto}
+.sec-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+.note{margin-top:8px}
+#xfer{width:100%;margin-top:8px;font:12px/1.4 var(--mono);background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}
+#micOut{display:grid;gap:8px;margin-top:10px}
+
+/* plan */
+#plan .ar h2,#plan .ar h3{font-family:var(--ar);font-weight:600}
+#plan .ar{font-size:1rem}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.week{border-top:1px solid var(--line);padding:10px 0;display:grid;grid-template-columns:5.5em 1fr;gap:12px}
+.week b{font-family:var(--mono);font-size:.85rem}
+.tpl{direction:ltr;text-align:left;font-family:var(--read);background:var(--sunk);border-radius:8px;padding:10px 14px;margin:6px 0 14px;line-height:1.7;white-space:pre-line}
+.weights td,.weights th{text-align:right}
+.weights{min-width:0}
+
+/* phone: app-style bottom tab bar, compact header, sticky submit bar, 16px inputs so iOS does not zoom */
+@media (max-width:640px){
+  body{font-size:15px}
+  .top .wrap{padding-block:8px;gap:6px 10px;flex-wrap:nowrap}
+  .brand span{display:none}
+  .envbar{gap:4px}
+  .env{padding:.25em .5em}
+  .env b{display:none}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;flex-wrap:nowrap;gap:0;background:var(--bar);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08)}
+  .tabs button{flex:1;font-size:.8rem;padding:.75em .2em;border-radius:8px}
+  main,#plan{padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
+  .hero{padding:16px;gap:18px}
+  .overall{font-size:3.6rem}
+  .card,.result{padding:14px}
+  .instr{padding:12px 12px 0;font-size:.85rem}
+  .rbody{padding:12px}
+  .rbar{padding:8px 12px}
+  .runner{overflow:visible}
+  .rfoot{border-radius:0 0 var(--r) var(--r)}
+  .rfoot{position:sticky;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:4;padding:10px 12px}
+  .rfoot button{flex:1}
+  .passage{font-size:1.02rem}
+  select.blank,input.gap,button.drop,.notes textarea,#xfer,.wbox textarea,.wbox input{font-size:16px}
+  .trait{grid-template-columns:minmax(0,8em) 1fr auto}
+  .cards{grid-template-columns:1fr}
+  .after button{flex:1}
+  .hero-cta button{flex:1 1 100%}
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Band 80 <span>PTE Academic trainer</span></div>
+    <nav class="tabs" aria-label="Sections">
+      <button type="button" data-go="home" aria-current="page">Dashboard</button>
+      <button type="button" data-go="practice">Practice</button>
+      <button type="button" data-go="mock">Mock tests</button>
+      <button type="button" data-go="plan">Plan</button>
+    </nav>
+    <div class="envbar">
+      <span class="env" id="env-mic" data-state="wait"><b>Mic: asks on first speaking task</b></span>
+      <span class="env" id="env-ai" data-state="off"><b>AI examiner off</b></span>
+      <span class="env" id="env-sync" data-state="off"><b>Saved in this browser</b></span>
+    </div>
+  </div>
+</header>
+
+<main id="view" class="wrap" aria-live="polite">
+  <section class="hero"><div class="hero-l"><span class="eyebrow">Estimated PTE score</span><div class="overall mono">—<span>/90</span></div><p class="muted">Loading your progress…</p></div><div class="hero-r"></div></section>
+</main>
+
+<section id="plan" class="wrap" hidden>
+  <div class="card ar" dir="rtl">
+    <h2>الطريق لـ 80+ في 10 أسابيع</h2>
+    <p>أغلب برامج أستراليا اللي بتطلب 80 بتقصد <b>80 في كل مهارة</b> (Speaking و Writing و Reading و Listening)، مش الـ Overall بس. راجع الرقم المطلوب بالظبط في صفحة البرنامج أو الجامعة قبل ما تحجز.</p>
+    <p>السكور في PTE مش بيتحسب لكل قسم لوحده: سؤال واحد بيغذي مهارتين. عشان كده فيه 6 أسئلة شايلة أغلب الدرجة، وهما اللي هنركز عليهم.</p>
+  </div>
+
+  <div class="plan-grid">
+    <div class="card ar" dir="rtl">
+      <h3>الأسئلة اللي شايلة الدرجة</h3>
+      <div class="tbl-wrap"><table class="tbl weights"><thead><tr><th>السؤال</th><th>بيغذي</th><th>التمرين اليومي</th></tr></thead><tbody>
+        <tr><td><span class="code mono">RS</span> Repeat Sentence</td><td>Speaking + Listening</td><td>20 جملة</td></tr>
+        <tr><td><span class="code mono">WFD</span> Write from Dictation</td><td>Listening + Writing</td><td>20 جملة</td></tr>
+        <tr><td><span class="code mono">RA</span> Read Aloud</td><td>Speaking + Reading</td><td>8 نصوص</td></tr>
+        <tr><td><span class="code mono">RWFIB</span> R&amp;W Fill in Blanks</td><td>Reading + Writing</td><td>5 نصوص</td></tr>
+        <tr><td><span class="code mono">RFIB</span> Reading FIB</td><td>Reading</td><td>5 نصوص</td></tr>
+        <tr><td><span class="code mono">HIW</span> Highlight Incorrect</td><td>Listening + Reading</td><td>4 تسجيلات</td></tr>
+      </tbody></table></div>
+      <p class="muted sm">وبعدهم في الأهمية: DI و RL و SGD (الطلاقة) ثم SWT و Essay و SST (الشكل وعدد الكلمات).</p>
+    </div>
+
+    <div class="card ar" dir="rtl">
+      <h3>روتين يومي: 90 دقيقة</h3>
+      <div class="week"><b>15 د</b><span>RS بصوت عالي، وسجّل نفسك واسمع</span></div>
+      <div class="week"><b>15 د</b><span>WFD، وبعدين راجع كل كلمة غلط وضيفها لكشكول الإملاء</span></div>
+      <div class="week"><b>15 د</b><span>RA مع تقسيم الجمل، وبعدين DI أو RL بالـ template</span></div>
+      <div class="week"><b>20 د</b><span>FIB (RWFIB و RFIB)، وكل collocation جديدة تتكتب في جدول</span></div>
+      <div class="week"><b>10 د</b><span>HIW و LFIB</span></div>
+      <div class="week"><b>15 د</b><span>تمرين كتابة واحد يتصحح بالـ AI examiner (SWT أو SST أو Essay بالتناوب)</span></div>
+    </div>
+  </div>
+
+  <div class="card ar" dir="rtl">
+    <h3>الخطة أسبوع بأسبوع</h3>
+    <div class="week"><b>أسبوع 1</b><span>اعمل الـ Diagnostic، واتعلم شكل الـ 22 سؤال، واحفظ الـ templates اللي تحت. هدف الأسبوع إنك تعرف نقطة البداية.</span></div>
+    <div class="week"><b>2 و 3</b><span>Speaking أساسي: RS و RA كل يوم مع التركيز على الطلاقة (من غير وقفات ولا تكرار). DI بالـ template لحد ما تقوله 35 ثانية متواصلة.</span></div>
+    <div class="week"><b>4 و 5</b><span>Reading و Writing: FIB كل يوم (مفيش حاجة اسمها كلمات سهلة، اتعلم الـ collocations). SWT جملة واحدة، و Essay واحد كل يومين.</span></div>
+    <div class="week"><b>6 و 7</b><span>Listening: WFD و HIW كل يوم، و SST بالـ template، و RL و SGD مع notes.</span></div>
+    <div class="week"><b>8</b><span>Diagnostic تاني للمقارنة، وبعدين ركّز على أضعف 3 أسئلة في لوحة التحكم.</span></div>
+    <div class="week"><b>9</b><span>Full mock مرتين. وخد Official Scored Practice Test من Pearson عشان تعرف رقمك الحقيقي.</span></div>
+    <div class="week"><b>10</b><span>Full mock تالت، ومراجعة خفيفة، ونوم كويس. لو كل مهاراتك فوق 80 في آخر mock والـ scored test، احجز الامتحان.</span></div>
+  </div>
+
+  <div class="card ar" dir="rtl">
+    <h3>الـ Templates (احفظها لحد ما تطلع لوحدها)</h3>
+    <h4>Describe Image · 40 ثانية</h4>
+    <div class="tpl">The [bar chart / line graph / pie chart / diagram] illustrates [title].
+According to the chart, [X] has the highest figure, at [number], followed by [Y] at [number].
+In contrast, [Z] has the lowest figure, at only [number].
+Overall, [trend: increased / fluctuated / remained stable].
+In conclusion, there is a significant difference between [X] and [Z].</div>
+    <h4>Retell Lecture · 40 ثانية</h4>
+    <div class="tpl">The lecture was about [topic].
+The speaker mentioned that [keyword 1] and [keyword 2].
+He also explained that [keyword 3], which [effect].
+Furthermore, the lecturer pointed out [keyword 4].
+In conclusion, the lecture highlighted the importance of [topic].</div>
+    <h4>Summarize Group Discussion · لحد دقيقتين</h4>
+    <div class="tpl">The discussion was about [topic].
+The first speaker argued that [view], because [reason].
+However, the second speaker disagreed, pointing out that [view].
+The third speaker suggested [compromise / solution].
+In the end, they agreed that [conclusion].</div>
+    <h4>Respond to a Situation · 40 ثانية</h4>
+    <div class="tpl">Hi [name], sorry to bother you, but I have a problem with [issue].
+[Explain what happened in one or two sentences.]
+Would it be possible to [request]? Alternatively, could I [option B]?
+I would really appreciate your help. Thank you so much.</div>
+    <h4>Summarize Written Text · جملة واحدة</h4>
+    <div class="tpl">The passage explains that [main idea], which [key point 1], while [key point 2]; therefore, [conclusion].</div>
+    <h4>Summarize Spoken Text · 50 لـ 70 كلمة</h4>
+    <div class="tpl">The speaker discussed [topic]. He explained that [point 1]. Moreover, [point 2], because [reason]. He also mentioned [point 3]. Finally, the speaker concluded that [conclusion].</div>
+    <h4>Essay · 200 لـ 300 كلمة · 4 فقرات</h4>
+    <div class="tpl">P1: It is often argued that [topic]. While some believe [view A], I firmly believe that [your view], for two main reasons.
+P2: Firstly, [reason 1]. For example, [specific example]. As a result, [effect].
+P3: Secondly, [reason 2]. For instance, [example]. Therefore, [effect].
+P4: In conclusion, although [concession], I believe [restate view] because [reason 1] and [reason 2].</div>
+  </div>
+
+  <div class="plan-grid">
+    <div class="card ar" dir="rtl">
+      <h3>قواعد الـ 80+</h3>
+      <p>• في الـ Speaking الطلاقة أهم من الدقة. أوعى ترجع تصحح كلمة، وأوعى تسكت 3 ثواني لأن المايك بيقفل.</p>
+      <p>• اتكلم بسرعة كلامك العادي، مش أسرع. الـ chunks والنبرة أهم من اللكنة.</p>
+      <p>• الـ Writing: عدد الكلمات والشكل (form) لو اتكسروا بتاخد صفر في السؤال كله.</p>
+      <p>• الإملاء بالإنجليزي البريطاني أو الأمريكي مقبول، بس متخلطش الاتنين في نفس الإجابة.</p>
+      <p>• MCM و HIW فيهم سالب. متخمنش.</p>
+      <p>• الامتحان مفيهوش وقت ضايع: Reading و Listening ليهم ساعة إجمالي. اتمرن على الـ mock بالوقت.</p>
+    </div>
+    <div class="card ar" dir="rtl">
+      <h3>السكور هنا بيتحسب إزاي</h3>
+      <p>• Reading و Listening و FIB و WFD بيتصححوا بنفس قواعد Pearson (بما فيها السالب)، فدول دقيقين.</p>
+      <p>• الـ Writing بيصححه AI examiner بنفس معايير Pearson لما تفتح الصفحة على claude.ai. برة claude.ai بيبقى تقدير سريع.</p>
+      <p>• الـ Speaking: لما تشغّل النسخة المحلية على Chrome، المايك بيسجّل والـ speech recognition بيحسب المحتوى والطلاقة والنطق تقريبياً. على claude.ai المايك مقفول، فبتتمرن بالتوقيت وتقيّم نفسك.</p>
+      <p>• الأرقام تقدير. قبل الحجز لازم تاخد <b>Official Scored Practice Test</b> من Pearson عشان تتأكد من مستواك الحقيقي.</p>
+    </div>
+  </div>
+</section>
+
+<script src="bank.js"></script>
+<script src="bank2.js"></script>
+<script src="app.js"></script>
+</body></html>
